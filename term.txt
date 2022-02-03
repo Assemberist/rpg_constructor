@@ -1,0 +1,45 @@
+{class, 
+	"human",
+	[],
+	["talk", "attack", "defend", "run away"],
+	["live"],
+	["health", "strength"],
+	"It is just human - bag of bones and meat."}.
+
+{stat, "live", "It is alive."}.
+
+{parameter, "strength", "Strength increase damage when your character deals physic attack."}.
+
+{action, "attack", "Deals physic damage by coosen target."}.
+{action, "defend", "Reduces furter received damage."}.
+{action, "talk", "Attempt to communicate with target."}.
+
+{parameter, "health", "Your character will be dead when his health reaches 0."}.
+
+{class,
+	"warrior",
+	["human"],
+	["cover target"],
+	[],
+	[],
+	"Warrior - master of axe end shield."}.
+
+{initial_value, "warrior", "health", 50}.
+{initial_value, "warrior", "strength", 10}.
+
+{action, "cover target", "Defend target from attacks. All received damage will be received by character used that action."}.
+
+{class,
+	"wizzard",
+	["human"],
+	["cast fireball", "cast panzer"],
+	[],
+	["mana"],
+	"He weaker physically but he use magic."}.
+	
+{initial_value, "wizzard", "health", 25}.
+{initial_value, "wizzard", "strength", 5}.
+{initial_value, "wizzard", "mana", 50}.
+
+{action, "cast fireball", "Throw exploding fire sphere to several targets."}.
+{action, "cast panzer", "Summon magical shield on target"}.
