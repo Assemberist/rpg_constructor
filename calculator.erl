@@ -7,8 +7,39 @@ check_config(Objects) ->
 	%% search duplicates
 	uniq_objects(Objects),
 
+	%% Complete class atributes of classes from parents
 	Classes = [Obj || Obj = #class{} <- Objects],
-	search_parents(Classes).
+	{Classes, _Loops} = search_parents(Classes),
+
+	%% Get classes that have not founded parent
+	{_NormalClasses, _NoParent} = lists:partition(
+		fun	(#class{parents = []}) -> true;
+			(_) -> false end,
+		Classes),
+
+	search_attributes(Objects).
+
+search_attributes(Objects) ->
+	Classes = [Obj || Obj = #class{} <- Objects],
+	States = [Obj#stat.name || Obj = #stat{} <- Objects],
+	Propertyes = [Obj#parameter.name || Obj = #parameter{} <- Objects],
+	Actions = [Obj#action.name || Obj = #action{} <- Objects],
+
+	ClassStats = lists:usort([Stat || #class{stats = Stats} <- Classes, Stat <- Stats]),
+	ClassPropertyes = lists:usort([Stat || #class{parameters = Stats} <- Classes, Stat <- Stats]),
+	ClassActions = lists:usort([Stat || #class{actions = Stats} <- Classes, Stat <- Stats]),
+
+	NotFounded = #class{
+		stats = ClassStats -- States,
+		parameters = ClassPropertyes -- Propertyes,
+		actions = ClassActions -- Actions},
+
+	NotUsed = #class{
+		stats = States -- ClassStats,
+		parameters = Propertyes -- ClassPropertyes,
+		actions = Actions -- ClassActions},
+
+	{NotFounded, NotUsed}.
 	
 search_parents(Classes) ->
 	put(inherit_loops, []),
@@ -23,7 +54,7 @@ search_parents(Classes) ->
 	lists:map(fun(X)-> merge_parent_info(X, Classes, []) end, Base),
 
 	%% upload updated clases from dictionary
-	[get(Class#class.name) || Class <- Classes].
+	{[get(Class#class.name) || Class <- Classes], get(inherit_loops)}.
 
 merge_parent_info(Class, AllClasses, Stack) ->
 	case lists:member(Class#class.name, Stack) of
@@ -38,11 +69,12 @@ merge_parent_info(Class, AllClasses, Stack) ->
 				Childs);
 
 		true ->
-			[put(inherit_loops, [[Class#class.name | Stack] | get(inherit_loops)])]
+			put(inherit_loops, [[Class#class.name | Stack] | get(inherit_loops)])
 	end.
 
 merge_classes(Child, Parent) ->
 	Child#class{
+		parents = Child#class.parents -- [Parent#class.name],
 		actions = Parent#class.actions ++ Child#class.actions, 
 		stats = Parent#class.stats ++ Child#class.stats, 
 		parameters = Parent#class.parameters ++ Child#class.parameters
