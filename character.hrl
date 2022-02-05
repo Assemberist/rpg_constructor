@@ -1,5 +1,3 @@
--module(character).
-
 -record (stat, {
 	name		= ""	:: string(),
 	description	= ""	:: string()}).
