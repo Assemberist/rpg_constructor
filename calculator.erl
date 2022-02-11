@@ -9,13 +9,13 @@ check_config(Objects) ->
 
 	%% Complete class atributes of classes from parents
 	Classes = [Obj || Obj = #class{} <- Objects],
-	{Classes, _Loops} = search_parents(Classes),
+	{ComplementClasses, _Loops} = search_parents(Classes),
 
 	%% Get classes that have not founded parent
 	{_NormalClasses, _NoParent} = lists:partition(
 		fun	(#class{parents = []}) -> true;
 			(_) -> false end,
-		Classes),
+		ComplementClasses),
 
 	search_attributes(Objects).
 

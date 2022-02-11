@@ -1,6 +1,6 @@
 #!/usr/bin/env escript
 
-main([Arg | _]) ->
-	{ok, Terms} = file:consult(Arg),
-	io:format("~w\n",	[calculator:check_config(Terms)]).
+main(_)->
+	{ok, Terms} = file:consult("term.txt"),
+	io:format("~p\n",	[calculator:check_config(Terms)]).
 
